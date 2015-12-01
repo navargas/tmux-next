@@ -1,0 +1,25 @@
+#!/bin/bash
+shell_name=bash
+cmd="$@"
+filterstring='#{pane_active} #{session_name} #{window_index} #{pane_id} #{pane_pid}'
+if [ -z "$1" ]; then
+  echo Usage: next_available_shell command to run
+fi
+
+available_pane=$( \
+  tmux list-panes -a -F "$filterstring" | \
+  grep '^0 '"$(tmux display-message -p '#S') $(tmux display-message -p '#I')" | \
+  awk '{printf("%s %s %s ", $2, $3, $4); system("pstree "$5)}' | \
+  grep $shell_name'$' | \
+  head -n 1 \
+)
+
+if [ -z "$available_pane" ]; then
+  echo There are no available panes with name $shell_name
+  exit 1
+fi
+
+# fill argumets with {1:session_name 2:window_name 3:pane_id 4:bash}
+set -- $available_pane
+
+tmux send-keys -t $3 "$cmd" C-m
