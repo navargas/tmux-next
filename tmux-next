@@ -3,7 +3,7 @@ shell_name=bash
 cmd="$@"
 filterstring='#{pane_active} #{session_name} #{window_index} #{pane_id} #{pane_pid}'
 if [ -z "$1" ]; then
-  echo Usage: next_available_shell command to run
+  echo Usage: tmux-next command argument_1 argument_n
 fi
 
 available_pane=$( \
